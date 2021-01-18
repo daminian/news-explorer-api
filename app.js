@@ -29,14 +29,14 @@ app.use(helmet());
 const hosts = [
   'https://localhost:3000',
   'http://localhost:3000',
-  'https://www.api.daminian-news-explorer.nomoreparties.space',
-  'http://www.api.daminian-news-explorer.nomoreparties.space',
-  'https://api.daminian-news-explorer.nomoreparties.space',
-  'http://api.daminian-news-explorer.nomoreparties.space',
-  'https://www.daminian-news-explorer.students.nomoreparties.space',
-  'http://www.daminian-news-explorer.students.nomoreparties.space',
-  'https://daminian-news-explorer.students.nomoreparties.space',
-  'http://daminian-news-explorer.students.nomoreparties.space',
+  'https://www.api.news-daminian.students.nomoreparties.space',
+  'http://www.api.news-daminian.students.nomoreparties.space',
+  'https://api.news-daminian.students.nomoreparties.space',
+  'http://api.news-daminian.students.nomoreparties.space',
+  'https://www.news-daminian.students.nomoreparties.space',
+  'http://www.news-daminian.students.nomoreparties.space',
+  'https://news-daminian.students.nomoreparties.space',
+  'http://news-daminian.students.nomoreparties.space',
 ];
 app.use(cors({ origin: hosts }));
 
