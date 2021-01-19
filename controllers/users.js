@@ -6,13 +6,16 @@ const {
 } = require('../errors/errors');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
+const {
+  INVALID_REQUEST, USER_NOT_FOUND, USER_ALREADY_EXISTS, ERROR_EMAIL_PASS,
+} = require('../configs/constants');
 
 module.exports.getUserInfo = (req, res, next) => {
   const id = req.user._id;
   return User.findById(id)
     .then((user) => {
       if (!user) {
-        throw new ErrorNotFound('Пользователь не найден');
+        throw new ErrorNotFound(USER_NOT_FOUND);
       }
       res.send({ name: user.name, email: user.email });
     })
@@ -23,7 +26,7 @@ module.exports.createUser = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then((data) => {
       if (data.email === req.body.email) {
-        throw new ErrorConflict('Данный пользователь уже зарегистрирован');
+        throw new ErrorConflict(USER_ALREADY_EXISTS);
       }
     });
 
@@ -39,10 +42,10 @@ module.exports.createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.name === 'MongoError') {
-            next(new ErrorConflict('Данный пользователь уже зарегистрирован'));
+            next(new ErrorConflict(USER_ALREADY_EXISTS));
           }
           if (err.name === 'ValidationError') {
-            next(new ErrorRequest('Некорректные данные'));
+            next(new ErrorRequest(INVALID_REQUEST));
           } else {
             next(err);
           }
@@ -55,7 +58,7 @@ module.exports.login = (req, res, next) => {
   User.findUserByEmail(email, password)
     .then((user) => {
       if (!user) {
-        throw new ErrorAuth('Ведены неправильный email или пароль');
+        throw new ErrorAuth(ERROR_EMAIL_PASS);
       }
       const jwtToken = jwt.sign(
         { _id: user._id },
@@ -65,7 +68,7 @@ module.exports.login = (req, res, next) => {
     })
     .catch((err) => {
       if (err) {
-        next(new ErrorAuth('Ведены неправильный email или пароль'));
+        next(new ErrorAuth(ERROR_EMAIL_PASS));
       } else {
         next(err);
       }

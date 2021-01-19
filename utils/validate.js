@@ -1,7 +1,15 @@
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, CelebrateError } = require('celebrate');
 const validator = require('validator');
+const { INVALID_URL } = require('../configs/constants');
 
 const usersEmail = (v) => validator.isEmail(v);
+
+function urlValidation(value) {
+  if (!validator.isURL(value)) {
+    throw new CelebrateError(INVALID_URL);
+  }
+  return value;
+}
 
 const validateRegistration = celebrate({
   body: Joi.object().keys({
@@ -31,10 +39,8 @@ const validateArticlesPost = celebrate({
     text: Joi.string().required(),
     date: Joi.string().required(),
     source: Joi.string().required(),
-    // eslint-disable-next-line no-useless-escape
-    link: Joi.string().required().pattern(new RegExp('^(https?\:\/\/)([www\.])*([\w!-\~])*\#?$')),
-    // eslint-disable-next-line no-useless-escape
-    image: Joi.string().required().pattern(new RegExp('^(https?\:\/\/)([www\.])*([\w!-\~])*\#?$')),
+    link: Joi.string().custom(urlValidation).required(),
+    image: Joi.string().custom(urlValidation).required(),
   }),
 });
 

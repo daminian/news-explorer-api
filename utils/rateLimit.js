@@ -1,9 +1,11 @@
 const rateLimit = require('express-rate-limit');
+const { RATELIMWIN, RATELIMMAX } = require('../configs/config');
+const { RATE_LIMIT } = require('../configs/constants');
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 50,
-  message: 'Слишком много запросов с одного IP!',
+  windowMs: RATELIMWIN,
+  max: RATELIMMAX,
+  message: RATE_LIMIT,
 });
 
 module.exports = limiter;

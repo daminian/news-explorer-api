@@ -1,5 +1,6 @@
 const Article = require('../models/article');
 const { ErrorRequest, ErrorForbidden, ErrorNotFound } = require('../errors/errors');
+const { INVALID_REQUEST, ARTICLE_NOT_FOUND, NOT_YOUR_ARTICLE } = require('../configs/constants');
 
 module.exports.findArticle = (req, res, next) => {
   Article.find()
@@ -15,7 +16,7 @@ module.exports.creatArticle = (req, res, next) => {
     keyword, title, text, date, source, link, image,
   } = req.body;
   if (!keyword || !title || !text || !date || !source || !link || !image) {
-    throw new ErrorRequest('Введены неверные данные');
+    throw new ErrorRequest(INVALID_REQUEST);
   }
   Article.create({
     keyword, title, text, date, source, link, image, owner: req.user._id,
@@ -25,7 +26,7 @@ module.exports.creatArticle = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ErrorRequest('Введены неверные данные'));
+        next(new ErrorRequest(INVALID_REQUEST));
       }
 
       next(err);
@@ -36,9 +37,9 @@ module.exports.deleteArticle = (req, res, next) => {
   Article.findById(req.params.id)
     .then((article) => {
       if (!article) {
-        throw new ErrorNotFound('Новость не найдена');
+        throw new ErrorNotFound(ARTICLE_NOT_FOUND);
       } if ((article.owner._id.toString() || article.owner.id.toString()) !== req.user._id) {
-        throw new ErrorForbidden('Недостаточно прав');
+        throw new ErrorForbidden(NOT_YOUR_ARTICLE);
       }
       return Article.findByIdAndRemove(req.params.id)
         .then((responce) => {
@@ -51,7 +52,7 @@ module.exports.deleteArticle = (req, res, next) => {
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        next(new ErrorNotFound('Новость не найдена'));
+        next(new ErrorNotFound(ARTICLE_NOT_FOUND));
       } else {
         next(err);
       }

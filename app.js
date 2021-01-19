@@ -5,19 +5,17 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const PORT = 3000;
-const app = express();
 const { errors } = require('celebrate');
-const { createUser, login } = require('./controllers/users');
-const auth = require('./middlewares/auth');
-const UserRouter = require('./routes/users');
-const ArticleRouter = require('./routes/articles');
+const urls = require('./routes/index');
 const limiter = require('./utils/rateLimit');
-const { validateRegistration, validateLogin } = require('./utils/validate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorServer = require('./middlewares/error');
+const { MONGOURL } = require('./configs/config');
 
-mongoose.connect('mongodb://localhost:27017/newsdb', {
+const { PORT = 3000, MONGODB = MONGOURL } = process.env;
+const app = express();
+
+mongoose.connect(MONGODB, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -47,11 +45,7 @@ app.use(limiter);
 
 app.use(requestLogger);
 
-app.post('/signup', validateRegistration, createUser);
-app.post('/signin', validateLogin, login);
-
-app.use('/', auth, UserRouter);
-app.use('/', auth, ArticleRouter);
+app.use('/', urls);
 
 app.use(errorLogger);
 app.use(errors());
